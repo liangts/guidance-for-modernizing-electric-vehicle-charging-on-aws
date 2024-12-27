@@ -7,13 +7,14 @@ import websockets
 
 import gateway
 
-logging.basicConfig(format="%(message)s", level=logging.ERROR)
+logging.basicConfig(format="%(message)s", level=logging.INFO)
 
 OCPP_PROTOCOLS = os.environ["OCPP_PROTOCOLS"].split(",")
 OCPP_GATEWAY_PORT = int(os.environ["OCPP_GATEWAY_PORT"])
 
 
 async def handler(websocket, path):
+    logging.info(f"Path: {path}")
     if "Sec-WebSocket-Protocol" not in websocket.request_headers:
         logging.info("Client hasn't requested any Subprotocol. " "Closing Connection")
         return await websocket.close()

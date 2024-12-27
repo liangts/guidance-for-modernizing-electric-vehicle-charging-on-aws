@@ -1,0 +1,32 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Attach using Process Id",
+            "type": "debugpy",
+            "request": "attach",
+            "processId": "${command:pickProcess}"
+        },
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}", // 当前文件路径
+            "console": "integratedTerminal",
+            "env": {
+                "AWS_REGION": "us-east-2",
+                "DYNAMODB_CHARGE_POINT_TABLE": "AwsOcppGatewayStack-ChargePointTable0F8300CB-UI0SWRCMFR3N",
+                "OCPP_PROTOCOLS": "ocpp1.6,ocpp2.0.1",
+                "OCPP_GATEWAY_PORT": "8080",
+                "IOT_ENDPOINT": "a3r79d786mugi0-ats.iot.us-east-2.amazonaws.com",
+                "IOT_PORT": "8883"
+            }
+            // "args": [
+            //     "--url",
+            //     "ws://ocpp-gateway-2337d11bee44a15c.elb.us-east-2.amazonaws.com",
+            //     "--cp-id",
+            //     "CP1"
+            // ]
+        }
+    ]
+}

@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 
 class ChargePointSimlator(cp):
     async def send_boot_notification(self):
-        request = call.BootNotificationPayload(
+        request = call.BootNotification(
             charging_station={
                 "serial_number": arguments["cp_serial"],
                 "model": arguments["cp_model"],
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--cp-serial",
         help="The Change Point serial number",
-        default="CP1234567890A01",
+        default="CP1",
         required=False,
     )
 
