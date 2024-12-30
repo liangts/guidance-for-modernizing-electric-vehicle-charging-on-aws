@@ -24,7 +24,7 @@ class Gateway(asyncio_mqtt.Client):
     def __init__(self, charge_point_id, websocket_connection):
         self.charge_point_id = charge_point_id
         self.websocket_connection = websocket_connection
-        self.ssl = self.create_ssl_context()
+        # self.ssl = self.create_ssl_context()
         self.hostname = os.environ["IOT_ENDPOINT"]
         self.port = int(os.environ["IOT_PORT"])
 
@@ -36,10 +36,10 @@ class Gateway(asyncio_mqtt.Client):
             raise ChargePointDoesNotExist(error)
 
         super().__init__(
-            self.hostname,
+            self.hostname, 
             self.port,
             client_id=self.charge_point_id,
-            tls_context=self.ssl,
+            # tls_context=self.ssl,
         )
 
     def charge_point_exists(self):

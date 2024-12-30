@@ -8,4 +8,4 @@ echo "Successfully set IOT certificates"
 echo "Starting the gateway server"
 cd /home/appuser/ocpp-gateway
 source bin/activate
-exec python3.10 server.py
+exec python3 server.py
