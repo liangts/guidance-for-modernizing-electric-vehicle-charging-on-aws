@@ -13,8 +13,8 @@ OCPP_PROTOCOLS = os.environ["OCPP_PROTOCOLS"].split(",")
 OCPP_GATEWAY_PORT = int(os.environ["OCPP_GATEWAY_PORT"])
 
 
-async def handler(websocket, path):
-    logging.info(f"Path: {path}")
+async def handler(websocket):
+    # logging.info(f"Path: {path}")
     if "Sec-WebSocket-Protocol" not in websocket.request_headers:
         logging.info("Client hasn't requested any Subprotocol. " "Closing Connection")
         return await websocket.close()
@@ -28,7 +28,8 @@ async def handler(websocket, path):
         return await websocket.close()
 
     logging.info(f"Protocols Matched: {websocket.subprotocol}")
-    charge_point_id = path.strip("/")
+    # charge_point_id = path.strip("/")
+    charge_point_id = "CP1"
 
     try:
         async with gateway.Gateway(charge_point_id, websocket) as iot_connection:
