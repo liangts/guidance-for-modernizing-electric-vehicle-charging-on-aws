@@ -30,7 +30,7 @@ async def handler(websocket):
     logging.info(f"Protocols Matched: {websocket.subprotocol}")
     # charge_point_id = path.strip("/")
     charge_point_id = "CP1"
-
+    logging.info(f"MQTT Connect to: {charge_point_id}")
     try:
         async with gateway.Gateway(charge_point_id, websocket) as iot_connection:
             await asyncio.gather(
