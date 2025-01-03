@@ -13,12 +13,14 @@ OCPP_PROTOCOLS = os.environ["OCPP_PROTOCOLS"].split(",")
 OCPP_GATEWAY_PORT = int(os.environ["OCPP_GATEWAY_PORT"])
 
 
-async def handler(websocket, path):
-    if "Sec-WebSocket-Protocol" not in websocket.request_headers:
+async def handler(websocket):
+    path = websocket.request.path
+
+    if "Sec-WebSocket-Protocol" not in websocket.request.headers:
         logging.info("Client hasn't requested any Subprotocol. " "Closing Connection")
         return await websocket.close()
 
-    requested_protocols = websocket.request_headers["Sec-WebSocket-Protocol"]
+    requested_protocols = websocket.request.headers["Sec-WebSocket-Protocol"]
     if not websocket.subprotocol:
         logging.error(
             f"Protocols Mismatched | Expected Subprotocols: {websocket.available_subprotocols},"
