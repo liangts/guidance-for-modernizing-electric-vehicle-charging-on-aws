@@ -545,9 +545,11 @@ export class AwsOcppGatewayStack extends cdk.Stack {
     );
     const incomingMessages = new sqs.Queue(this, 'IncomingMessagesQueue', {
       enforceSSL: true,
+      // Six times the 30-second processor timeout; matches the PR3 rollout.
+      visibilityTimeout: cdk.Duration.seconds(180),
       deadLetterQueue: {
         queue: deadLetterQueueForIncomingMessages,
-        maxReceiveCount: 3,
+        maxReceiveCount: 5,
       },
     });
 

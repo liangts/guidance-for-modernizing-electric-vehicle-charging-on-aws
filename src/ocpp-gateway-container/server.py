@@ -7,19 +7,20 @@ import websockets
 
 import gateway
 
-logging.basicConfig(format="%(message)s", level=logging.INFO)
+logging.basicConfig(format="%(message)s", level=logging.ERROR)
 
 OCPP_PROTOCOLS = os.environ["OCPP_PROTOCOLS"].split(",")
 OCPP_GATEWAY_PORT = int(os.environ["OCPP_GATEWAY_PORT"])
 
 
 async def handler(websocket):
-    # logging.info(f"Path: {path}")
-    if "Sec-WebSocket-Protocol" not in websocket.request_headers:
+    path = websocket.request.path
+
+    if "Sec-WebSocket-Protocol" not in websocket.request.headers:
         logging.info("Client hasn't requested any Subprotocol. " "Closing Connection")
         return await websocket.close()
 
-    requested_protocols = websocket.request_headers["Sec-WebSocket-Protocol"]
+    requested_protocols = websocket.request.headers["Sec-WebSocket-Protocol"]
     if not websocket.subprotocol:
         logging.error(
             f"Protocols Mismatched | Expected Subprotocols: {websocket.available_subprotocols},"
@@ -28,9 +29,8 @@ async def handler(websocket):
         return await websocket.close()
 
     logging.info(f"Protocols Matched: {websocket.subprotocol}")
-    # charge_point_id = path.strip("/")
-    charge_point_id = "CP1"
-    logging.info(f"MQTT Connect to: {charge_point_id}")
+    charge_point_id = path.strip("/")
+
     try:
         async with gateway.Gateway(charge_point_id, websocket) as iot_connection:
             await asyncio.gather(

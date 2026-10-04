@@ -1,3 +1,7 @@
+import json
+import uuid
+from datetime import datetime, timezone
+
 import asyncio_mqtt
 import boto3
 import logging
@@ -24,7 +28,10 @@ class Gateway(asyncio_mqtt.Client):
     def __init__(self, charge_point_id, websocket_connection):
         self.charge_point_id = charge_point_id
         self.websocket_connection = websocket_connection
-        # self.ssl = self.create_ssl_context()
+        # The selected subprotocol is connection evidence, not a payload guess.
+        self.protocol_version = websocket_connection.subprotocol
+        self.connection_id = str(uuid.uuid4())
+        self.ssl = self.create_ssl_context()
         self.hostname = os.environ["IOT_ENDPOINT"]
         self.port = int(os.environ["IOT_PORT"])
 
@@ -36,10 +43,10 @@ class Gateway(asyncio_mqtt.Client):
             raise ChargePointDoesNotExist(error)
 
         super().__init__(
-            self.hostname, 
+            self.hostname,
             self.port,
             client_id=self.charge_point_id,
-            # tls_context=self.ssl,
+            tls_context=self.ssl,
         )
 
     def charge_point_exists(self):
@@ -81,4 +88,21 @@ class Gateway(asyncio_mqtt.Client):
         """Forwards a message from the websocket to the IoT Core topic"""
         while True:
             message = await self.websocket_connection.recv()
-            await self.publish(topic, payload=message)
+            if self.protocol_version == "ocpp2.0.1":
+                # A separate three-level topic avoids the existing '+/in' rule.
+                # Legacy frames retain their original route and old processor.
+                envelope = {
+                    "protocolVersion": self.protocol_version,
+                    "protocolVersionSource": "websocket",
+                    "connectionId": self.connection_id,
+                    "direction": "inbound",
+                    "receivedAt": datetime.now(timezone.utc).isoformat(),
+                    "message": message,
+                }
+                await self.publish(
+                    f"{self.charge_point_id}/v201/in",
+                    payload=json.dumps(envelope),
+                    qos=1,
+                )
+            else:
+                await self.publish(topic, payload=message)
