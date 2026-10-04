@@ -1,29 +1,5 @@
-FROM amazonlinux:latest
-
-RUN yum update -y
-RUN yum groupinstall "Development Tools" -y
-RUN yum install openssl-libs -y
-RUN yum install python3 python3-devel -y
-RUN yum install cronie cronie-anacron -y
-
-RUN useradd -ms /bin/bash appuser
-
-RUN mkdir /home/appuser/ocpp-gateway
-RUN mkdir /home/appuser/iot-certificates/
-RUN chown appuser /home/appuser/ocpp-gateway
-RUN chown appuser /home/appuser/iot-certificates
-
-COPY ./ /home/appuser/ocpp-gateway/
-RUN chmod +x /home/appuser/ocpp-gateway/run-server.sh
-
-USER appuser
-
-RUN python3 -m venv /home/appuser/ocpp-gateway/
-RUN . /home/appuser/ocpp-gateway/bin/activate && pip install -r /home/appuser/ocpp-gateway/requirements.txt
-
-EXPOSE 8080
-
-ENTRYPOINT /home/appuser/ocpp-gateway/run-server.sh
-CMD /home/appuser/ocpp-gateway/run-server.sh
-
-HEALTHCHECK --interval=150s --timeout=30s --start-period=300s --start-interval=150s CMD curl --fail http://localhost:8080 || exit 1
+# Preserve the verified running ARM64 runtime and dependencies for this rollout.
+# Only gateway application code changes; certificates remain runtime-injected.
+ARG BASE_IMAGE=920373019462.dkr.ecr.us-east-2.amazonaws.com/cdk-hnb659fds-container-assets-920373019462-us-east-2@sha256:a0778481a5ac5b9fe9b9642671b320f50cab8e458ec06c34238e72e19ed5cdbd
+FROM ${BASE_IMAGE}
+COPY gateway.py /home/appuser/ocpp-gateway/gateway.py
